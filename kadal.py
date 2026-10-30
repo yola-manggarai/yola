@@ -7,28 +7,64 @@ import streamlit as st
 # ---------------------------------------------------------------
 # Konfigurasi halaman
 # ---------------------------------------------------------------
-st.set_page_config(page_title="Profil Saya", page_icon="🏔️", layout="centered")
+st.set_page_config(page_title="Profil Saya", page_icon="🦎", layout="centered")
 
 # Simpan foto Anda dengan nama foto.jpg di folder yang sama dengan file ini
 GAMBAR_DEFAULT = "foto.jpg"
 
 # ---------------------------------------------------------------
+# Background kadal
+# Letakkan foto "kadal.jpg" / "kadal.png" di folder yang sama untuk
+# memakai foto sendiri. Jika tidak ada, dipakai pola kadal bawaan.
+# ---------------------------------------------------------------
+KADAL_SVG = """
+<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'>
+  <rect width='220' height='220' fill='#2d5a3d'/>
+  <g transform='rotate(-20 110 110)' stroke='#1f3d2a' stroke-width='2'
+     stroke-linecap='round' stroke-linejoin='round'>
+    <path d='M74 110 C45 110 45 140 15 142' fill='none' stroke-width='9'/>
+    <path d='M95 98 L82 80 L70 82 M130 98 L140 80 L152 82
+             M95 122 L82 140 L70 138 M130 122 L140 140 L152 138'
+          fill='none' stroke-width='6'/>
+    <ellipse cx='110' cy='110' rx='38' ry='16' fill='#5aa86b'/>
+    <ellipse cx='158' cy='110' rx='16' ry='12' fill='#6dbb7c'/>
+    <circle cx='163' cy='106' r='2.5' fill='#000' stroke='none'/>
+    <circle cx='163' cy='114' r='2.5' fill='#000' stroke='none'/>
+  </g>
+</svg>
+"""
+
+
+def muat_background():
+    """Kembalikan (css_background, ukuran) untuk gambar kadal."""
+    for nama_file, mime in (("kadal.jpg", "jpeg"), ("kadal.jpeg", "jpeg"), ("kadal.png", "png")):
+        if Path(nama_file).exists():
+            b64 = base64.b64encode(Path(nama_file).read_bytes()).decode()
+            return (
+                f'url("data:image/{mime};base64,{b64}") no-repeat center center fixed',
+                "cover",
+            )
+    b64 = base64.b64encode(KADAL_SVG.encode()).decode()
+    return f'url("data:image/svg+xml;base64,{b64}") repeat', "220px 220px"
+
+
+BG_KADAL, BG_UKURAN = muat_background()
+
+# ---------------------------------------------------------------
 # Dua tema warna:
-#   - "awal"    : tampilan senja (sebelum / saat isian belum lengkap)
-#   - "lengkap" : tampilan fajar hijau-emas (saat semua isian terisi)
+#   - "awal"    : tampilan gelap (sebelum / saat isian belum lengkap)
+#   - "lengkap" : tampilan hijau (saat semua isian terisi)
 # ---------------------------------------------------------------
 TEMA = {
     "awal": {
-        "sky_top": "#1e3c72", "sky_mid": "#4a7fb5", "sky_bottom": "#f6c28b",
-        "sun": "#fff4d6",
+        "overlay": "rgba(0,0,0,0.30)",
         "btn_a": "#2f6f8f", "btn_b": "#3fa796", "btn_shadow": "47,111,143",
         "chip_bg": "#e3f2ef", "chip_fg": "#1d6b5f", "chip_border": "#b9e0d8",
         "tag_bg": "#2f6f8f",
         "card_border": "#3fa796",
     },
     "lengkap": {
-        "sky_top": "#0f4c5c", "sky_mid": "#2a9d8f", "sky_bottom": "#ffd166",
-        "sun": "#fff1b8",
+        "overlay": "rgba(22,163,74,0.30)",
         "btn_a": "#16a34a", "btn_b": "#84cc16", "btn_shadow": "22,163,74",
         "chip_bg": "#fff3c4", "chip_fg": "#8a5a00", "chip_border": "#f5d77a",
         "tag_bg": "#16a34a",
@@ -37,76 +73,21 @@ TEMA = {
 }
 
 
-def buat_svg(t):
-    """Background gunung (SVG dibuat langsung, jadi tidak perlu internet)."""
-    return f"""
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-  <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="{t['sky_top']}"/>
-      <stop offset="0.55" stop-color="{t['sky_mid']}"/>
-      <stop offset="1" stop-color="{t['sky_bottom']}"/>
-    </linearGradient>
-    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#7a8fb8"/>
-      <stop offset="1" stop-color="#a9b8d6"/>
-    </linearGradient>
-    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4b5f8f"/>
-      <stop offset="1" stop-color="#6d80ad"/>
-    </linearGradient>
-    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1f3b4d"/>
-      <stop offset="1" stop-color="#2f5d62"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="1600" height="900" fill="url(#sky)"/>
-  <circle cx="1250" cy="260" r="70" fill="{t['sun']}" opacity="0.9"/>
-
-  <g fill="#ffffff" opacity="0.55">
-    <ellipse cx="300" cy="190" rx="130" ry="26"/>
-    <ellipse cx="380" cy="170" rx="90" ry="24"/>
-    <ellipse cx="900" cy="130" rx="150" ry="24"/>
-    <ellipse cx="990" cy="112" rx="90" ry="22"/>
-  </g>
-
-  <path d="M0 620 L180 440 L300 540 L470 360 L640 560 L800 420 L980 580
-           L1150 400 L1330 560 L1480 450 L1600 540 L1600 900 L0 900 Z" fill="url(#far)"/>
-
-  <path d="M0 700 L220 470 L420 680 L640 330 L880 660 L1080 420 L1300 680
-           L1450 520 L1600 650 L1600 900 L0 900 Z" fill="url(#mid)"/>
-  <path d="M640 330 L585 400 L615 388 L640 415 L668 388 L698 402 Z" fill="#ffffff" opacity="0.92"/>
-  <path d="M1080 420 L1040 470 L1065 460 L1085 482 L1108 460 L1130 472 Z" fill="#ffffff" opacity="0.9"/>
-  <path d="M220 470 L190 505 L212 497 L226 512 L244 496 L258 506 Z" fill="#ffffff" opacity="0.85"/>
-
-  <path d="M0 800 L260 600 L520 780 L780 640 L1050 790 L1320 620 L1600 780 L1600 900 L0 900 Z"
-        fill="url(#near)"/>
-  <g fill="#14302f">
-    <path d="M90 820 l24 -70 l24 70 z"/><path d="M130 830 l20 -58 l20 58 z"/>
-    <path d="M1380 820 l24 -72 l24 72 z"/><path d="M1430 830 l20 -58 l20 58 z"/>
-    <path d="M1490 825 l22 -64 l22 64 z"/>
-  </g>
-</svg>
-"""
-
-
 def terapkan_tema(nama_tema):
     """Pasang CSS sesuai tema yang dipilih."""
     t = TEMA[nama_tema]
-    bg_b64 = base64.b64encode(buat_svg(t).encode()).decode()
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background: url("data:image/svg+xml;base64,{bg_b64}") no-repeat center bottom fixed;
-            background-size: cover;
+            background: linear-gradient({t['overlay']}, {t['overlay']}), {BG_KADAL};
+            background-size: auto, {BG_UKURAN};
         }}
         header[data-testid="stHeader"] {{ background: transparent; }}
         .block-container {{ padding-top: 2.5rem; max-width: 760px; }}
 
         .judul {{ text-align: center; color: #ffffff; margin-bottom: 1.5rem;
-                  text-shadow: 0 2px 12px rgba(0,0,0,.45); }}
+                  text-shadow: 0 2px 12px rgba(0,0,0,.6); }}
         .judul h1 {{ font-size: 2.4rem; margin: 0; font-weight: 800; }}
         .judul p  {{ margin: .3rem 0 0; font-size: 1.05rem; opacity: .92; }}
 
@@ -171,7 +152,7 @@ terapkan_tema("awal")
 st.markdown(
     """
     <div class="judul">
-        <h1>🏔️ Profil Saya</h1>
+        <h1>🦎 Profil Saya</h1>
         <p>Isi data diri Anda, lalu lihat hasilnya di bawah</p>
     </div>
     """,
@@ -203,8 +184,8 @@ if submit:
         and bool(hobi)
         and gambar is not None
     )
-    
-    # Jika sudah disubmit, perbarui tema jika diperlukan
+
+    # Jika semua terisi, timpa dengan tema "lengkap"
     if lengkap:
         terapkan_tema("lengkap")
 
