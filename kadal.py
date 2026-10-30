@@ -13,23 +13,38 @@ st.set_page_config(page_title="Profil Saya", page_icon="🦎", layout="centered"
 GAMBAR_DEFAULT = "foto.jpg"
 
 # ---------------------------------------------------------------
-# Background kadal
-# Letakkan foto "kadal.jpg" / "kadal.png" di folder yang sama untuk
-# memakai foto sendiri. Jika tidak ada, dipakai pola kadal bawaan.
+# Background kadal (disesuaikan dengan karakter pada gambar)
 # ---------------------------------------------------------------
 KADAL_SVG = """
-<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'>
-  <rect width='220' height='220' fill='#2d5a3d'/>
-  <g transform='rotate(-20 110 110)' stroke='#1f3d2a' stroke-width='2'
-     stroke-linecap='round' stroke-linejoin='round'>
-    <path d='M74 110 C45 110 45 140 15 142' fill='none' stroke-width='9'/>
-    <path d='M95 98 L82 80 L70 82 M130 98 L140 80 L152 82
-             M95 122 L82 140 L70 138 M130 122 L140 140 L152 138'
-          fill='none' stroke-width='6'/>
-    <ellipse cx='110' cy='110' rx='38' ry='16' fill='#5aa86b'/>
-    <ellipse cx='158' cy='110' rx='16' ry='12' fill='#6dbb7c'/>
-    <circle cx='163' cy='106' r='2.5' fill='#000' stroke='none'/>
-    <circle cx='163' cy='114' r='2.5' fill='#000' stroke='none'/>
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'>
+  <rect width='300' height='300' fill='#000000'/>
+  <g transform='translate(20, 20)'>
+    <!-- Badan & Leher -->
+    <path d='M100 280 C100 200 120 160 140 140 C160 120 180 125 190 140 C200 155 200 220 200 280 Z' fill='#579e73'/>
+    
+    <!-- Tangan Melambai -->
+    <path d='M115 200 C90 190 70 170 50 185 C40 192 45 205 55 200 C70 193 85 205 100 212 Z' fill='#579e73'/>
+    <circle cx='46' cy='183' r='7' fill='#579e73'/>
+    <circle cx='36' cy='193' r='6' fill='#579e73'/>
+    <circle cx='43' cy='206' r='6' fill='#579e73'/>
+    <circle cx='56' cy='212' r='6' fill='#579e73'/>
+
+    <!-- Kepala -->
+    <path d='M120 130 C110 110 130 75 170 70 C210 65 240 90 235 120 C230 150 190 160 150 150 Z' fill='#579e73'/>
+    <!-- Dagu / Senyuman -->
+    <path d='M135 135 C160 155 200 145 220 125' fill='none' stroke='#3e7352' stroke-width='3' stroke-linecap='round'/>
+
+    <!-- Mata Kiri (Belakang) -->
+    <circle cx='165' cy='75' r='24' fill='#ffffff'/>
+    <circle cx='172' cy='75' r='9' fill='#111111'/>
+    
+    <!-- Mata Kanan (Depan) -->
+    <circle cx='210' cy='85' r='28' fill='#ffffff'/>
+    <circle cx='217' cy='85' r='10' fill='#111111'/>
+
+    <!-- Lubang Hidung -->
+    <circle cx='232' cy='112' r='2.5' fill='#3e7352'/>
+    <circle cx='239' cy='115' r='2.5' fill='#3e7352'/>
   </g>
 </svg>
 """
@@ -45,7 +60,7 @@ def muat_background():
                 "cover",
             )
     b64 = base64.b64encode(KADAL_SVG.encode()).decode()
-    return f'url("data:image/svg+xml;base64,{b64}") repeat', "220px 220px"
+    return f'url("data:image/svg+xml;base64,{b64}") repeat', "300px 300px"
 
 
 BG_KADAL, BG_UKURAN = muat_background()
@@ -134,7 +149,7 @@ def terapkan_tema(nama_tema):
         .info-gender {{ color: #4b5f78; margin-bottom: .9rem; font-weight: 500; }}
         .info-cita {{ font-size: 1.1rem; font-weight: 600; color: #17324d; margin: 0 0 .9rem; }}
         .info-label {{ font-size: .8rem; text-transform: uppercase; letter-spacing: 1px;
-                       color: #6b7f95; margin-bottom: .35rem; font-weight: 700; }}
+                        color: #6b7f95; margin-bottom: .35rem; font-weight: 700; }}
         .chip {{ display: inline-block; background: {t['chip_bg']}; color: {t['chip_fg']};
                  padding: .3rem .85rem; border-radius: 999px; margin: 0 .35rem .35rem 0;
                  font-size: .9rem; font-weight: 600; border: 1px solid {t['chip_border']}; }}
